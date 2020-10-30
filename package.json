@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "export": "next export",
-    "deploy": "gh-pages -d out",
+    "export": "next export && touch ./out/.nojekyll",
+    "deploy": "gh-pages -d out -t true",
     "start": "next start"
   },
   "author": {
@@ -34,7 +34,7 @@
     "@types/classnames": "^2.2.11",
     "@types/dedent": "^0.7.0",
     "@types/json5": "^0.0.30",
-    "@types/lodash": "^4.14.163",
+    "@types/lodash": "^4.14.164",
     "@types/node": "^14.14.6",
     "@types/prop-types": "^15.7.3",
     "@types/qs": "^6.9.5",

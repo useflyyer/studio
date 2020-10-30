@@ -1,4 +1,6 @@
-module.exports = {
+const NODE_ENV = process.env.NODE_ENV || "development";
+
+const config = {
   poweredByHeader: false,
   // Build time
   env: {},
@@ -9,6 +11,11 @@ module.exports = {
   redirects() {
     return [];
   },
-  basePath: "/flayyer-studio",
-  assetPrefix: "/flayyer-studio/",
 };
+
+if (NODE_ENV === "production") {
+  config.basePath = "/flayyer-studio";
+  config.assetPrefix = "/flayyer-studio/";
+}
+
+module.exports = config;

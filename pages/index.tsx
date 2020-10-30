@@ -18,7 +18,7 @@ const Container = styled.div`
 `;
 
 const Aside = styled.aside`
-  width: 300px;
+  width: 320px;
   box-shadow: 0px 0px 10px #acacac;
   z-index: 10;
   background-color: white;
@@ -193,6 +193,16 @@ export default function Home() {
             </div>
 
             <form onSubmit={handleValidSubmit}>
+              <div className="field">
+                <p>
+                  Get the Base URL by running <code>npm start</code> or <code>yarn start</code> on your project created
+                  with{" "}
+                  <a href="https://www.npmjs.com/package/create-flayyer-app" target="_blank" rel="noopener noreferrer">
+                    create-flayyer-app
+                  </a>
+                </p>
+              </div>
+
               <div className="field">
                 <label className="label">Base URL</label>
                 <div className="control">
