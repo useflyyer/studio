@@ -9,4 +9,6 @@ module.exports = {
   redirects() {
     return [];
   },
+  basePath: "/flayyer-studio",
+  assetPrefix: "/flayyer-studio/",
 };
