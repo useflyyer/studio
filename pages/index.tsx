@@ -129,7 +129,7 @@ type FormSchema = {
 const INITIAL_URL = new URL("http://localhost:7777/page.html?title=Hello+World");
 const INITIAL_FORM: FormSchema = {
   template: INITIAL_URL.pathname,
-  base: INITIAL_URL.host,
+  base: INITIAL_URL.protocol + "//" + INITIAL_URL.host,
   variables: JSON5.stringify(qs.parse(INITIAL_URL.search, { ignoreQueryPrefix: true }), null, 2),
 };
 
