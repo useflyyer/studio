@@ -126,7 +126,7 @@ type FormSchema = {
   variables: string;
 };
 
-const INITIAL_URL = new URL("http://localhost:7777/page.html?title=Hello+World");
+const INITIAL_URL = new URL("http://localhost:7777/main?title=Hello+World");
 const INITIAL_FORM: FormSchema = {
   template: INITIAL_URL.pathname,
   base: INITIAL_URL.protocol + "//" + INITIAL_URL.host,
@@ -172,12 +172,16 @@ export default function Home() {
     setSettings((state) => ({ ...state, mode: "story", width: "1080px", height: "1920px" }));
   }
 
-  const href = url.href;
+  const cloned = new URL(url.href);
+  if (!cloned.pathname.endsWith(".html")) {
+    cloned.pathname = cloned.pathname + ".html";
+  }
+  const href = cloned.href;
 
   return (
     <div>
       <Head>
-        <title>Create Next App</title>
+        <title>Flayyer Studio</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -233,7 +237,7 @@ export default function Home() {
               <div className="field">
                 <label className="label">Template</label>
                 <div className="control">
-                  <input className="input" name="template" type="text" ref={form.register()} placeholder="page" />
+                  <input className="input" name="template" type="text" ref={form.register()} placeholder="main" />
                 </div>
                 <p className="help is-danger">
                   <ErrorMessage name="template" errors={form.errors} />
