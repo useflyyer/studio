@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import classNames from "classnames";
 import Head from "next/head";
 import qs from "qs";
 import JSON5 from "json5";
 import { useForm } from "react-hook-form";
+import { useSearchParam } from "react-use";
 import { ErrorMessage } from "@hookform/error-message";
 
 const Container = styled.div`
@@ -126,15 +127,14 @@ type FormSchema = {
   variables: string;
 };
 
-const INITIAL_URL = new URL("http://localhost:7777/main?title=Hello+World");
-const INITIAL_FORM: FormSchema = {
-  template: INITIAL_URL.pathname,
-  base: INITIAL_URL.protocol + "//" + INITIAL_URL.host,
-  variables: JSON5.stringify(qs.parse(INITIAL_URL.search, { ignoreQueryPrefix: true }), null, 2),
-};
+function FORM_TO_URL(input: FormSchema) {
+  const u = new URL(input.template, input.base);
+  u.search = qs.stringify(JSON5.parse(input.variables));
+  return u;
+}
 
 export default function Home() {
-  const [url, setURL] = useState(INITIAL_URL);
+  const [url, setURL] = useState<URL>();
   const [settings, setSettings] = useState<IFrameProps>({
     mode: "banner",
     width: "1200px",
@@ -143,14 +143,27 @@ export default function Home() {
   });
   const form = useForm<FormSchema>({
     mode: "onBlur",
-    defaultValues: INITIAL_FORM,
   });
+
+  const paramTemplate = useSearchParam("template") || "main";
+  const paramHost = useSearchParam("host") || "localhost";
+  const paramPort = useSearchParam("port") || "7777";
+
+  useEffect(() => {
+    const input: FormSchema = {
+      template: paramTemplate,
+      base: "http:" + "//" + paramHost + ":" + paramPort,
+      variables: JSON5.stringify({ title: "Hello World" }, null, 2),
+    };
+    form.setValue("template", input.template);
+    form.setValue("base", input.base);
+    form.setValue("variables", input.variables);
+    setURL(FORM_TO_URL(input));
+  }, [paramTemplate, paramHost, paramPort]);
 
   const handleValidSubmit = form.handleSubmit((input) => {
     try {
-      const u = new URL(input.template, input.base);
-      u.search = qs.stringify(JSON5.parse(input.variables));
-      setURL(u);
+      setURL(FORM_TO_URL(input));
     } catch (e) {
       console.error(e);
       alert(e.message);
@@ -172,11 +185,14 @@ export default function Home() {
     setSettings((state) => ({ ...state, mode: "story", width: "1080px", height: "1920px" }));
   }
 
-  const cloned = new URL(url.href);
-  if (!cloned.pathname.endsWith(".html")) {
-    cloned.pathname = cloned.pathname + ".html";
-  }
-  const href = cloned.href;
+  const cloned = useMemo(() => {
+    if (!url) return null;
+    const cloned = new URL(url.href);
+    if (!cloned.pathname.endsWith(".html")) {
+      cloned.pathname = cloned.pathname + ".html";
+    }
+    return cloned;
+  }, [url]);
 
   return (
     <div>
@@ -285,9 +301,11 @@ export default function Home() {
                   {settings.width} x {settings.height}
                 </p>
                 <IFrameContainer {...settings}>
-                  <IFrameWrap {...settings}>
-                    <IFrame {...settings} src={href} />
-                  </IFrameWrap>
+                  {cloned && (
+                    <IFrameWrap {...settings}>
+                      <IFrame {...settings} src={cloned.href} />
+                    </IFrameWrap>
+                  )}
                 </IFrameContainer>
               </div>
             </WorkspaceContent>
