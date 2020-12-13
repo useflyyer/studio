@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import classNames from "classnames";
 import Head from "next/head";
-import qs from "qs";
-import JSON5 from "json5";
-import { useForm } from "react-hook-form";
 import { useSearchParam } from "react-use";
+import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
+import JSON5 from "json5";
+import qs from "qs";
 
 const Container = styled.div`
   width: 100vw;
@@ -125,6 +125,10 @@ type FormSchema = {
   template: string;
   base: string;
   variables: string;
+  /**
+   * Pass `_ua=` query param to iframe.
+   */
+  agent?: string;
 };
 
 function FORM_TO_URL(input: FormSchema) {
@@ -143,6 +147,9 @@ export default function Home() {
   });
   const form = useForm<FormSchema>({
     mode: "onBlur",
+    defaultValues: {
+      agent: "",
+    },
   });
 
   const paramTemplate = useSearchParam("template") || "main";
@@ -155,9 +162,9 @@ export default function Home() {
       base: "http:" + "//" + paramHost + ":" + paramPort,
       variables: JSON5.stringify({ title: "Hello World" }, null, 2),
     };
-    form.setValue("template", input.template);
-    form.setValue("base", input.base);
-    form.setValue("variables", input.variables);
+    for (const [key, value] of Object.entries(input)) {
+      form.setValue(key as any, value);
+    }
     setURL(FORM_TO_URL(input));
   }, [paramTemplate, paramHost, paramPort]);
 
@@ -176,7 +183,7 @@ export default function Home() {
   }
 
   function handleSquare() {
-    setSettings((state) => ({ ...state, mode: "square", width: "1200px", height: "1200px" }));
+    setSettings((state) => ({ ...state, mode: "square", width: "1080px", height: "1080px" }));
   }
   function handleBanner() {
     setSettings((state) => ({ ...state, mode: "banner", width: "1200px", height: "630px" }));
@@ -185,14 +192,45 @@ export default function Home() {
     setSettings((state) => ({ ...state, mode: "story", width: "1080px", height: "1920px" }));
   }
 
+  const frame = { ...settings }; // clone
+
+  // Adapt frame depending on user agent
+  const agent = form.watch("agent");
+  const forceSquare = agent === "whatsapp"; // TODO: check other platforms where a format is forced.
+  if (forceSquare) {
+    frame.width = "630px";
+    frame.height = "630px";
+  }
+
   const cloned = useMemo(() => {
     if (!url) return null;
     const cloned = new URL(url.href);
     if (!cloned.pathname.endsWith(".html")) {
       cloned.pathname = cloned.pathname + ".html";
     }
+    if (forceSquare) {
+      cloned.searchParams.set("_ua", "whatsapp");
+    }
     return cloned;
-  }, [url]);
+  }, [url, forceSquare]);
+
+  const MODES = [
+    {
+      name: "Banner (1:1.91)",
+      mode: "banner",
+      action: handleBanner,
+    },
+    {
+      name: "Square (1:1)",
+      mode: "square",
+      action: handleSquare,
+    },
+    {
+      name: "Story (9:16)",
+      mode: "story",
+      action: handleStory,
+    },
+  ];
 
   return (
     <div>
@@ -231,16 +269,7 @@ export default function Home() {
                     name="base"
                     type="url"
                     ref={form.register({
-                      validate: {
-                        url: (value) => {
-                          try {
-                            new URL(value);
-                            return true;
-                          } catch (e) {
-                            return e.message;
-                          }
-                        },
-                      },
+                      validate: { url: VALIDATE_URL },
                     })}
                     placeholder="http://localhost:7777"
                   />
@@ -258,6 +287,22 @@ export default function Home() {
                 <p className="help is-danger">
                   <ErrorMessage name="template" errors={form.errors} />
                 </p>
+                <p className="help">{"Same as your template's file name without extension"}</p>
+              </div>
+
+              <div className="field">
+                <label className="label">User agent</label>
+                <div className="control">
+                  <div className="select is-fullwidth">
+                    <select name="agent" ref={form.register}>
+                      <option value="">Default</option>
+                      <option value="whatsapp">WhatsApp</option>
+                    </select>
+                  </div>
+                </div>
+                <p className="help">
+                  Read this value form the <code>agent</code> prop
+                </p>
               </div>
 
               <div className="field">
@@ -268,16 +313,7 @@ export default function Home() {
                     className="input"
                     name="variables"
                     ref={form.register({
-                      validate: {
-                        json: (value) => {
-                          try {
-                            JSON5.parse(value);
-                            return true;
-                          } catch (e) {
-                            return e.message;
-                          }
-                        },
-                      },
+                      validate: { json: VALIDATE_JSON5 },
                     })}
                     rows={4}
                     placeholder="{}"
@@ -286,8 +322,12 @@ export default function Home() {
                 <p className="help is-danger">
                   <ErrorMessage name="variables" errors={form.errors} />
                 </p>
+                <p className="help">
+                  Read this value form the <code>variables</code> prop
+                </p>
               </div>
-              <button type="submit" className="button is-primary is-fullwidth">
+
+              <button type="submit" className="mt-4 button is-primary is-fullwidth has-text-weight-semibold">
                 Refresh
               </button>
             </form>
@@ -298,12 +338,12 @@ export default function Home() {
             <WorkspaceContent>
               <div>
                 <p style={{ zIndex: 9 }}>
-                  {settings.width} x {settings.height}
+                  {frame.width} x {frame.height}
                 </p>
-                <IFrameContainer {...settings}>
+                <IFrameContainer {...frame}>
                   {cloned && (
-                    <IFrameWrap {...settings}>
-                      <IFrame {...settings} src={cloned.href} />
+                    <IFrameWrap {...frame}>
+                      <IFrame {...frame} src={cloned.href} />
                     </IFrameWrap>
                   )}
                 </IFrameContainer>
@@ -312,41 +352,27 @@ export default function Home() {
 
             <WorkspaceMenu>
               <WorkspaceMenuItem>
-                <div className="field has-addons has-shadow">
-                  <p className="control">
-                    <button
-                      className={classNames({
-                        "button is-primary is-light has-text-weight-semibold": true,
-                        "is-active": settings.mode === "banner",
-                      })}
-                      onClick={handleBanner}
-                    >
-                      <span>Banner (1:1.91)</span>
-                    </button>
-                  </p>
-                  <p className="control">
-                    <button
-                      className={classNames({
-                        "button is-primary is-light has-text-weight-semibold": true,
-                        "is-active": settings.mode === "square",
-                      })}
-                      onClick={handleSquare}
-                    >
-                      <span>Square (1:1)</span>
-                    </button>
-                  </p>
-                  <p className="control">
-                    <button
-                      className={classNames({
-                        "button is-primary is-light has-text-weight-semibold": true,
-                        "is-active": settings.mode === "story",
-                      })}
-                      onClick={handleStory}
-                    >
-                      <span>Story (9:16)</span>
-                    </button>
-                  </p>
-                </div>
+                {forceSquare ? (
+                  <div className="field">
+                    <p className="text">WhatsApp has a fixed size</p>
+                  </div>
+                ) : (
+                  <div className="field has-addons has-shadow">
+                    {MODES.map((mode) => (
+                      <p key={mode.mode} className="control">
+                        <button
+                          className={classNames({
+                            "button is-primary is-light has-text-weight-semibold": true,
+                            "is-active": frame.mode === mode.mode,
+                          })}
+                          onClick={mode.action}
+                        >
+                          <span>{mode.name}</span>
+                        </button>
+                      </p>
+                    ))}
+                  </div>
+                )}
 
                 <div className="field" style={{ marginLeft: "1.5rem" }}>
                   <label style={{ display: "none" }} className="label">
@@ -359,7 +385,7 @@ export default function Home() {
                       min="0.10"
                       max="1"
                       step={0.001}
-                      value={settings.ratio}
+                      value={frame.ratio}
                       onChange={handleRatio}
                     ></input>
                   </div>
@@ -371,4 +397,22 @@ export default function Home() {
       </main>
     </div>
   );
+}
+
+function VALIDATE_URL(value: string) {
+  try {
+    new URL(value);
+    return true;
+  } catch (e) {
+    return e.message;
+  }
+}
+
+function VALIDATE_JSON5(value: string) {
+  try {
+    JSON5.parse(value);
+    return true;
+  } catch (e) {
+    return e.message;
+  }
 }
