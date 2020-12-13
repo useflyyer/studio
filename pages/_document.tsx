@@ -29,7 +29,7 @@ export default class MyDocument extends Document {
 
   render() {
     return (
-      <Html lang="en" prefix="og: https://ogp.me/ns#">
+      <Html prefix="og: https://ogp.me/ns#">
         <Head />
         <body>
           <Main />
