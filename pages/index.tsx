@@ -21,9 +21,10 @@ const Container = styled.div`
 const Aside = styled.aside`
   width: 320px;
   box-shadow: 0px 0px 10px #acacac;
-  z-index: 10;
   background-color: white;
   padding: 0.75rem;
+  overflow-y: scroll;
+  z-index: 10;
 
   display: flex;
   flex-direction: column;
@@ -34,7 +35,7 @@ const Aside = styled.aside`
 const Content = styled.div`
   position: relative;
   flex: 1;
-  /* margin-top: calc(0.75rem * 4); */
+  overflow: hidden;
 `;
 
 type IFrameProps = { mode?: string; width: any; height: any; ratio: any };
@@ -88,6 +89,7 @@ const WorkspaceContent = styled(Layer)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding-top: calc(0.75rem * 3);
 `;
 const WorkspaceMenu = styled(Layer)`
   display: flex;
@@ -327,13 +329,13 @@ export default function Home() {
                 </p>
               </div>
 
-              <button type="submit" className="mt-4 button is-primary is-fullwidth has-text-weight-semibold">
+              <button type="submit" className="my-4 button is-primary is-fullwidth has-text-weight-semibold">
                 Refresh
               </button>
             </form>
           </Aside>
           <Content>
-            <WorkspaceBackground></WorkspaceBackground>
+            <WorkspaceBackground />
 
             <WorkspaceContent>
               <div>
