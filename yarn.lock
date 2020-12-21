@@ -2413,11 +2413,6 @@ flatted@^3.1.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.1.0.tgz#a5d06b4a8b01e3a63771daa5cb7a1903e2e57067"
   integrity sha512-tW+UkmtNg/jv9CSofAKvgVcO7c2URjhTdW1ZTkcAritblu8tajiYy7YisnIflEwtKssCtOxpnBRoCB7iap0/TA==
 
-flayyer@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/flayyer/-/flayyer-0.1.0.tgz#bc60b296eb7fe5d6c62c39595930baf8b0e6bfc8"
-  integrity sha512-J//RGrNgd/w2myw5zqj3AzBESh7wZIoEhIIc7V4tXqvMzOwpY/hRF9AwncDaMXGDElrJqvkfuFWzG7O5SFEL/Q==
-
 flush-write-stream@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/flush-write-stream/-/flush-write-stream-1.1.1.tgz#8dd7d873a1babc207d94ead0c2e0e44276ebf2e8"
