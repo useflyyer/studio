@@ -1,12 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import classNames from "classnames";
-import Head from "next/head";
+import NextHead from "next/head";
+import Flayyer from "@flayyer/flayyer";
 import { useSearchParam } from "react-use";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import JSON5 from "json5";
 import qs from "qs";
+
+const flayyer = new Flayyer({
+  tenant: "flayyer",
+  deck: "landing",
+  template: "demo",
+  extension: "png",
+  variables: { title: "Flayyer Studio", description: "Test your Flayyers locally!" },
+});
 
 const Container = styled.div`
   width: 100vw;
@@ -236,11 +245,17 @@ export default function Home() {
 
   return (
     <div>
-      <Head>
+      <NextHead>
         <title>Flayyer Studio</title>
         <link rel="icon" href="/favicon.ico" />
-      </Head>
-
+        <meta charSet="UTF-8" />
+        <meta property="og:title" content={"Flayyer Studio"} />
+        <meta property="og:description" content={"Test your flayyers locally"} />
+        <meta name="twitter:site" content={"https://flayyer.github.io/flayyer-studio"} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={flayyer.href()} />
+        <meta property="og:image" content={flayyer.href()} />
+      </NextHead>
       <main>
         <Container>
           <Aside>

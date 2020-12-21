@@ -219,6 +219,16 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@flayyer/flayyer-types@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@flayyer/flayyer-types/-/flayyer-types-1.2.2.tgz#f90cc0fdaee33cd441f30e624ef81b42737ec94e"
+  integrity sha512-qimprQ8J6ZrkzmsG7KpLfmVShfC9WNVcJ7KbxqbtuumSStNifMlUGWeH0tLUKnpIeK3xW5bUqpecEH3l9Jyuyw==
+
+"@flayyer/flayyer@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@flayyer/flayyer/-/flayyer-1.1.0.tgz#adf5ee5f9edcdf30bd128053cafa449950e655eb"
+  integrity sha512-cO6+1yjh8X1yEJn+eqyYBMesUul+5yztuoCMOEzX6iIna5iVXJEOF1Ayl4QKi5NXDyYSg97aoJgVRmoFrfzrwg==
+
 "@hapi/accept@5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@hapi/accept/-/accept-5.0.1.tgz#068553e867f0f63225a506ed74e899441af53e10"
@@ -2402,6 +2412,11 @@ flatted@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.1.0.tgz#a5d06b4a8b01e3a63771daa5cb7a1903e2e57067"
   integrity sha512-tW+UkmtNg/jv9CSofAKvgVcO7c2URjhTdW1ZTkcAritblu8tajiYy7YisnIflEwtKssCtOxpnBRoCB7iap0/TA==
+
+flayyer@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/flayyer/-/flayyer-0.1.0.tgz#bc60b296eb7fe5d6c62c39595930baf8b0e6bfc8"
+  integrity sha512-J//RGrNgd/w2myw5zqj3AzBESh7wZIoEhIIc7V4tXqvMzOwpY/hRF9AwncDaMXGDElrJqvkfuFWzG7O5SFEL/Q==
 
 flush-write-stream@^1.0.0:
   version "1.1.1"

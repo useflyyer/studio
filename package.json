@@ -21,6 +21,7 @@
     "@hookform/error-message": "^0.0.5",
     "classnames": "^2.2.6",
     "dedent": "^0.7.0",
+    "flayyer": "^0.1.0",
     "json5": "^2.1.3",
     "lodash": "^4.17.20",
     "next": "10.0.3",
@@ -32,6 +33,8 @@
     "styled-components": "^5.2.1"
   },
   "devDependencies": {
+    "@flayyer/flayyer": "^1.1.0",
+    "@flayyer/flayyer-types": "^1.2.2",
     "@types/classnames": "^2.2.11",
     "@types/dedent": "^0.7.0",
     "@types/json5": "^0.0.30",
