@@ -247,7 +247,7 @@ export default function Home() {
     <div>
       <NextHead>
         <title>Flayyer Studio</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/flayyer-studio/favicon.ico" />
         <meta charSet="UTF-8" />
         <meta property="og:title" content={"Flayyer Studio"} />
         <meta property="og:description" content={"Test your flayyers locally"} />
