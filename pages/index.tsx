@@ -1,20 +1,24 @@
 import React, { useEffect, useMemo, useState } from "react";
-import styled from "styled-components";
-import classNames from "classnames";
-import NextHead from "next/head";
+
 import Flayyer from "@flayyer/flayyer";
-import { useSearchParam } from "react-use";
-import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
+import classNames from "classnames";
 import JSON5 from "json5";
+import NextHead from "next/head";
 import qs from "qs";
+import { useForm } from "react-hook-form";
+import { useSearchParam } from "react-use";
+import styled from "styled-components";
 
 const flayyer = new Flayyer({
   tenant: "flayyer",
   deck: "landing",
   template: "demo",
   extension: "png",
-  variables: { title: "Flayyer Studio", description: "Test your Flayyers locally!" },
+  meta: {
+    id: "flayyer-studio",
+  },
+  variables: { title: "Flayyer Studio", description: "Development companion tool" },
 });
 
 const Container = styled.div`
@@ -215,14 +219,14 @@ export default function Home() {
 
   const cloned = useMemo(() => {
     if (!url) return null;
-    const cloned = new URL(url.href);
-    if (!cloned.pathname.endsWith(".html")) {
-      cloned.pathname = cloned.pathname + ".html";
+    const next = new URL(url.href);
+    if (!next.pathname.endsWith(".html")) {
+      next.pathname = next.pathname + ".html";
     }
     if (forceSquare) {
-      cloned.searchParams.set("_ua", "whatsapp");
+      next.searchParams.set("_ua", "whatsapp");
     }
-    return cloned;
+    return next;
   }, [url, forceSquare]);
 
   const MODES = [
