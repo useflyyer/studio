@@ -8,7 +8,7 @@ import JSON5 from "json5";
 import NextHead from "next/head";
 import qs from "qs";
 import { useForm } from "react-hook-form";
-import { useSearchParam, useSet } from "react-use";
+import { useLocalStorage, useSearchParam, useSet } from "react-use";
 import styled from "styled-components";
 
 enum FrameMode {
@@ -175,23 +175,32 @@ export default function Home() {
   });
   const { reset: formReset } = form;
 
+  const [settings, setSettings] = useLocalStorage<{ ratio?: number; variables?: string; modes?: FrameMode[] }>(
+    "settings",
+  );
+
   const paramTemplate = useSearchParam("template") || "main";
   const paramHost = useSearchParam("host") || "localhost";
   const paramPort = useSearchParam("port") || "7777";
 
+  // Kind of "on mount"
   useEffect(() => {
     const input: FormSchema = {
       template: paramTemplate,
       base: "http:" + "//" + paramHost + ":" + paramPort,
-      variables: JSON5.stringify({ title: "Hello World" }, null, 2),
+      variables: settings?.variables ? settings.variables : JSON5.stringify({ title: "Hello World" }, null, 2),
     };
     formReset(input);
     setURL(FORM_TO_URL(input));
+    if (settings?.ratio) setRatio(settings.ratio);
+    if (settings?.modes) settings.modes.forEach((m) => setModes.add(m));
   }, [formReset, paramTemplate, paramHost, paramPort]);
 
   const handleValidSubmit = form.handleSubmit((input) => {
     try {
       setURL(FORM_TO_URL(input));
+      // Save to local storage
+      setSettings({ ratio, variables: form.getValues("variables"), modes: Array.from(modes) });
     } catch (e) {
       console.error(e);
       alert(e.message);
