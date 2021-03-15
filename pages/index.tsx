@@ -1,14 +1,22 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Flayyer from "@flayyer/flayyer";
+import { Sizes } from "@flayyer/flayyer-types";
 import { ErrorMessage } from "@hookform/error-message";
 import classNames from "classnames";
 import JSON5 from "json5";
 import NextHead from "next/head";
 import qs from "qs";
 import { useForm } from "react-hook-form";
-import { useSearchParam } from "react-use";
+import { useSearchParam, useSet } from "react-use";
 import styled from "styled-components";
+
+enum FrameMode {
+  THUMBNAIL = "THUMBNAIL",
+  BANNER = "BANNER",
+  SQUARE = "SQUARE",
+  STORY = "STORY",
+}
 
 const flayyer = new Flayyer({
   tenant: "flayyer",
@@ -99,10 +107,13 @@ const WorkspaceBackground = styled(Layer)`
 `;
 const WorkspaceContent = styled(Layer)`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   padding-top: calc(0.75rem * 3);
+`;
+const WorkspaceContentItem = styled.div`
+  margin: 0 0.75rem;
 `;
 const WorkspaceMenu = styled(Layer)`
   display: flex;
@@ -152,20 +163,17 @@ function FORM_TO_URL(input: FormSchema) {
   return u;
 }
 
+const initialModes = new Set<FrameMode>([FrameMode.BANNER]);
+
 export default function Home() {
+  const [modes, setModes] = useSet<FrameMode>(initialModes);
+  const [ratio, setRatio] = useState(0.4);
   const [url, setURL] = useState<URL>();
-  const [settings, setSettings] = useState<IFrameProps>({
-    mode: "banner",
-    width: "1200px",
-    height: "630px",
-    ratio: 0.5,
-  });
   const form = useForm<FormSchema>({
     mode: "onBlur",
-    defaultValues: {
-      agent: "",
-    },
+    defaultValues: { agent: "" },
   });
+  const { reset: formReset } = form;
 
   const paramTemplate = useSearchParam("template") || "main";
   const paramHost = useSearchParam("host") || "localhost";
@@ -177,11 +185,9 @@ export default function Home() {
       base: "http:" + "//" + paramHost + ":" + paramPort,
       variables: JSON5.stringify({ title: "Hello World" }, null, 2),
     };
-    for (const [key, value] of Object.entries(input)) {
-      form.setValue(key as any, value);
-    }
+    formReset(input);
     setURL(FORM_TO_URL(input));
-  }, [paramTemplate, paramHost, paramPort]);
+  }, [formReset, paramTemplate, paramHost, paramPort]);
 
   const handleValidSubmit = form.handleSubmit((input) => {
     try {
@@ -193,59 +199,50 @@ export default function Home() {
   });
 
   function handleRatio(e: React.ChangeEvent<HTMLInputElement>) {
-    const ratio = Number(e.target.value);
-    setSettings((state) => ({ ...state, ratio }));
+    setRatio(Number(e.target.value));
   }
 
+  function handleThumb() {
+    setModes.toggle(FrameMode.THUMBNAIL);
+  }
   function handleSquare() {
-    setSettings((state) => ({ ...state, mode: "square", width: "1080px", height: "1080px" }));
+    setModes.toggle(FrameMode.SQUARE);
   }
   function handleBanner() {
-    setSettings((state) => ({ ...state, mode: "banner", width: "1200px", height: "630px" }));
+    setModes.toggle(FrameMode.BANNER);
   }
   function handleStory() {
-    setSettings((state) => ({ ...state, mode: "story", width: "1080px", height: "1920px" }));
+    setModes.toggle(FrameMode.STORY);
   }
-
-  const frame = { ...settings }; // clone
-
-  // Adapt frame depending on user agent
-  const agent = form.watch("agent");
-  const forceSquare = agent === "whatsapp"; // TODO: check other platforms where a format is forced.
-  if (forceSquare) {
-    frame.width = "630px";
-    frame.height = "630px";
-  }
-
-  const cloned = useMemo(() => {
-    if (!url) return null;
-    const next = new URL(url.href);
-    if (!next.pathname.endsWith(".html")) {
-      next.pathname = next.pathname + ".html";
-    }
-    if (forceSquare) {
-      next.searchParams.set("_ua", "whatsapp");
-    }
-    return next;
-  }, [url, forceSquare]);
 
   const MODES = [
     {
+      name: "Thumbnail (small)",
+      mode: FrameMode.THUMBNAIL,
+      size: Sizes.THUMBNAIL,
+      action: handleThumb,
+    },
+    {
       name: "Banner (1:1.91)",
-      mode: "banner",
+      mode: FrameMode.BANNER,
+      size: Sizes.BANNER,
       action: handleBanner,
     },
     {
       name: "Square (1:1)",
-      mode: "square",
+      mode: FrameMode.SQUARE,
+      size: Sizes.SQUARE,
       action: handleSquare,
     },
     {
       name: "Story (9:16)",
-      mode: "story",
+      mode: FrameMode.STORY,
+      size: Sizes.STORY,
       action: handleStory,
     },
   ];
+
+  const agent = form.watch("agent");
 
   return (
     <div>
@@ -276,7 +273,7 @@ export default function Home() {
                 <p>
                   Get the Base URL by running <code>npm start</code> or <code>yarn start</code> on your project created
                   with{" "}
-                  <a href="https://www.npmjs.com/package/create-flayyer-app" target="_blank" rel="noopener noreferrer">
+                  <a href="https://github.com/flayyer/create-flayyer-app" target="_blank" rel="noopener noreferrer">
                     create-flayyer-app
                   </a>
                 </p>
@@ -357,23 +354,46 @@ export default function Home() {
             <WorkspaceBackground />
 
             <WorkspaceContent>
-              <div>
-                <p style={{ zIndex: 9 }}>
-                  {frame.width} x {frame.height}
-                </p>
-                <IFrameContainer {...frame}>
-                  {cloned && (
-                    <IFrameWrap {...frame}>
-                      <IFrame {...frame} src={cloned.href} />
-                    </IFrameWrap>
-                  )}
-                </IFrameContainer>
-              </div>
+              {MODES.map((MODE) => {
+                if (!url) return;
+                if (!modes.has(MODE.mode)) return;
+                const [width, height] = MODE.size;
+                const frame: IFrameProps = {
+                  width: width + "px",
+                  height: height + "px",
+                  ratio,
+                  mode: MODE.mode,
+                };
+                const cloned = new URL(url.href);
+                if (!cloned.pathname.endsWith(".html")) {
+                  cloned.pathname = cloned.pathname + ".html";
+                }
+                cloned.searchParams.set("_w", String(width));
+                cloned.searchParams.set("_h", String(height));
+                if (agent) {
+                  cloned.searchParams.set("_ua", agent);
+                }
+
+                return (
+                  <WorkspaceContentItem key={MODE.mode}>
+                    <p style={{ zIndex: 9 }}>
+                      {width} x {height}px
+                    </p>
+                    <IFrameContainer {...frame}>
+                      {cloned && (
+                        <IFrameWrap {...frame}>
+                          <IFrame {...frame} src={cloned.href} />
+                        </IFrameWrap>
+                      )}
+                    </IFrameContainer>
+                  </WorkspaceContentItem>
+                );
+              })}
             </WorkspaceContent>
 
             <WorkspaceMenu>
               <WorkspaceMenuItem>
-                {forceSquare ? (
+                {false ? (
                   <div className="field">
                     <p className="text">WhatsApp has a fixed size</p>
                   </div>
@@ -384,7 +404,7 @@ export default function Home() {
                         <button
                           className={classNames({
                             "button is-primary is-light has-text-weight-semibold": true,
-                            "is-active": frame.mode === mode.mode,
+                            "is-active": modes.has(mode.mode),
                           })}
                           onClick={mode.action}
                         >
@@ -406,7 +426,7 @@ export default function Home() {
                       min="0.10"
                       max="1"
                       step={0.001}
-                      value={frame.ratio}
+                      value={ratio}
                       onChange={handleRatio}
                     ></input>
                   </div>
