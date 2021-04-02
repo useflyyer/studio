@@ -4,6 +4,7 @@ import Flayyer from "@flayyer/flayyer";
 import { Sizes } from "@flayyer/flayyer-types";
 import { ErrorMessage } from "@hookform/error-message";
 import clsx from "clsx";
+import dedent from "dedent";
 import JSON5 from "json5";
 import NextHead from "next/head";
 import qs from "qs";
@@ -11,12 +12,15 @@ import { useForm } from "react-hook-form";
 import { useLocalStorage, useSearchParam, useSet } from "react-use";
 import styled from "styled-components";
 
-enum FrameMode {
-  THUMBNAIL = "THUMBNAIL",
-  BANNER = "BANNER",
-  SQUARE = "SQUARE",
-  STORY = "STORY",
-}
+import { FlayyerLogo } from "~/components/FlayyerLogo";
+import { IFrameProps, IFrameContainer, IFrameWrap, IFrame } from "~/components/IFrame";
+import {
+  WorkspaceBackground,
+  WorkspaceContent,
+  WorkspaceContentItem,
+  WorkspaceMenu,
+  WorkspaceMenuItem,
+} from "~/components/Workspace";
 
 const flayyer = new Flayyer({
   tenant: "flayyer",
@@ -59,94 +63,6 @@ const Content = styled.div`
   overflow: hidden;
 `;
 
-type IFrameProps = { mode?: string; width: any; height: any; ratio: any };
-
-const IFrame = styled.iframe<IFrameProps>`
-  margin: 0;
-  border: 0;
-  padding: 0;
-  overflow: hidden;
-
-  width: ${(props) => props.width};
-  height: ${(props) => props.height};
-
-  transform: scale(${(props) => props.ratio});
-  transform-origin: left top;
-`;
-
-const IFrameWrap = styled.div<IFrameProps>`
-  width: calc(${(props) => props.width} * ${(props) => props.ratio});
-  height: calc(${(props) => props.height} * ${(props) => props.ratio});
-  position: absolute;
-  overflow: hidden;
-`;
-
-const IFrameContainer = styled.div<IFrameProps>`
-  position: relative;
-  overflow: hidden;
-  width: calc(${(props) => props.width} * ${(props) => props.ratio});
-  height: calc(${(props) => props.height} * ${(props) => props.ratio});
-
-  /* https://neumorphism.io/#CACACA */
-  /* box-shadow: 20px 20px 60px #acacac, -20px -20px 60px #e8e8e8; */
-  box-shadow: 20px 20px 60px #acacac;
-`;
-
-const Layer = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: transparent;
-`;
-
-const WorkspaceBackground = styled(Layer)`
-  background-color: #e5e5e5;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%239C92AC' fill-opacity='0.2' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
-`;
-const WorkspaceContent = styled(Layer)`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding-top: calc(0.75rem * 3);
-`;
-const WorkspaceContentItem = styled.div`
-  margin: 0 0.75rem;
-`;
-const WorkspaceMenu = styled(Layer)`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  pointer-events: none;
-
-  padding: calc(0.75rem * 2);
-`;
-const WorkspaceMenuItem = styled.div`
-  pointer-events: auto;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Logo = styled.p`
-  font-family: IBM Plex Sans;
-  font-size: 1em;
-  line-height: 1.5;
-  cursor: pointer;
-  box-sizing: inherit;
-  font-style: inherit;
-  font-weight: bold;
-  color: #4346de;
-
-  text-align: center;
-  padding: 1.5rem;
-  padding-bottom: calc(0.75rem * 3);
-`;
-
 type FormSchema = {
   template: string;
   base: string;
@@ -155,6 +71,7 @@ type FormSchema = {
    * Pass `_ua=` query param to iframe.
    */
   agent?: string;
+  // TODO: Locale variable `_lang`
 };
 
 const DEFAULT_VARIABLES = JSON5.stringify({ title: "Hello World" }, null, 2);
@@ -165,10 +82,17 @@ function FORM_TO_URL(input: FormSchema) {
   return u;
 }
 
-const initialModes = new Set<FrameMode>([FrameMode.BANNER]);
+enum FrameMode {
+  THUMBNAIL = "THUMBNAIL",
+  BANNER = "BANNER",
+  SQUARE = "SQUARE",
+  STORY = "STORY",
+}
+
+const INITIAL_MODE = new Set<FrameMode>([FrameMode.BANNER]);
 
 export default function Home() {
-  const [modes, setModes] = useSet<FrameMode>(initialModes);
+  const [modes, setModes] = useSet<FrameMode>(INITIAL_MODE);
   const [ratio, setRatio] = useState(0.4);
   const [url, setURL] = useState<URL>();
   const form = useForm<FormSchema>({
@@ -180,15 +104,18 @@ export default function Home() {
     formState: { errors },
   } = form;
 
-  const [settings, setSettings] = useLocalStorage<{ ratio?: number; variables?: string; modes?: FrameMode[] }>(
-    "settings",
-  );
+  interface LocalStorageState {
+    ratio?: number;
+    variables?: string;
+    modes?: FrameMode[];
+  }
+  const [settings, setSettings] = useLocalStorage<LocalStorageState>("settings");
 
   const paramTemplate = useSearchParam("template") || "main";
   const paramHost = useSearchParam("host") || "localhost";
   const paramPort = useSearchParam("port") || "7777";
 
-  // Kind of "on mount"
+  // Kind of "on mount", ignore `settings` dependency
   useEffect(() => {
     const input: FormSchema = {
       template: paramTemplate,
@@ -199,13 +126,15 @@ export default function Home() {
     setURL(FORM_TO_URL(input));
     if (settings?.ratio) setRatio(settings.ratio);
     if (settings?.modes) settings.modes.forEach((m) => setModes.add(m));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formReset, paramTemplate, paramHost, paramPort]);
 
   const handleValidSubmit = form.handleSubmit((input) => {
     try {
       setURL(FORM_TO_URL(input));
       // Save to local storage
-      setSettings({ ratio, variables: form.getValues("variables"), modes: Array.from(modes) });
+      const data: LocalStorageState = { ratio, variables: form.getValues("variables"), modes: Array.from(modes) };
+      setSettings(data);
     } catch (e) {
       console.error(e);
       alert(e.message);
@@ -258,28 +187,42 @@ export default function Home() {
 
   const agent = form.watch("agent");
 
+  const META_URL = "https://flayyer.github.io/flayyer-studio";
+  const META_TWITTER = "@flayyer_com";
+  const META_TITLE = "Flayyer Studio for developers";
+  const META_DESCRIPTION = dedent`
+    The official developer workspace to create and preview your Flayyers locally.
+    It connects to your localhost so you don't need to install additional software.
+  `;
   return (
     <div>
       <NextHead>
-        <title>Flayyer Studio</title>
-        <link rel="icon" href="/flayyer-studio/favicon.ico" />
         <meta charSet="UTF-8" />
-        <meta property="og:title" content={"Flayyer Studio"} />
-        <meta property="og:description" content={"Test your flayyers locally"} />
-        <meta name="twitter:site" content={"https://flayyer.github.io/flayyer-studio"} />
+        <title>Flayyer Studio</title>
+        <link rel="icon" href="/flayyer-studio/favicon.ico?__v=1" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/flayyer-studio/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/flayyer-studio/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/flayyer-studio/favicon-16x16.png" />
+        <link rel="manifest" href="/flayyer-studio/site.webmanifest" />
+        <meta property="og:title" content={META_TITLE} />
+        <meta property="og:description" content={META_DESCRIPTION} />
+        <meta property="og:url" content={META_URL} />
+        <meta property="og:image" content={flayyer.href()} />
+        <meta property="og:site_name" content="Flayyer Studio" />
+        <meta property="og:locale" content="en_US" />
+        <meta name="twitter:title" content={META_TITLE} />
+        <meta name="twitter:description" content={META_DESCRIPTION} />
+        <meta name="twitter:url" content={META_URL} />
+        <meta name="twitter:site" content={META_TWITTER} />
+        <meta name="twitter:creator" content={META_TWITTER} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content={flayyer.href()} />
-        <meta property="og:image" content={flayyer.href()} />
       </NextHead>
       <main>
         <Container>
           <Aside>
             <div>
-              <Logo>
-                <a href="https://flayyer.com?ref=studio" rel="noreferrer noopener" target="_blank">
-                  FLAYYER STUDIO
-                </a>
-              </Logo>
+              <FlayyerLogo />
             </div>
 
             <form onSubmit={handleValidSubmit}>
