@@ -232,6 +232,12 @@ export default function Home() {
       action: handleThumb,
     },
     {
+      name: "Banner (1:1.91)",
+      mode: FrameMode.BANNER,
+      size: Sizes.BANNER,
+      action: handleBanner,
+    },
+    {
       name: "Square (1:1)",
       mode: FrameMode.SQUARE,
       size: Sizes.SQUARE,
@@ -242,12 +248,6 @@ export default function Home() {
       mode: FrameMode.STORY,
       size: Sizes.STORY,
       action: handleStory,
-    },
-    {
-      name: "Banner (1:1.91)",
-      mode: FrameMode.BANNER,
-      size: Sizes.BANNER,
-      action: handleBanner,
     },
   ];
 
