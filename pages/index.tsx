@@ -157,9 +157,11 @@ type FormSchema = {
   agent?: string;
 };
 
+const DEFAULT_VARIABLES = JSON5.stringify({ title: "Hello World" }, null, 2);
+
 function FORM_TO_URL(input: FormSchema) {
   const u = new URL(input.template, input.base);
-  u.search = qs.stringify(JSON5.parse(input.variables));
+  u.search = qs.stringify(JSON5.parse(input.variables || "{}"));
   return u;
 }
 
@@ -191,7 +193,7 @@ export default function Home() {
     const input: FormSchema = {
       template: paramTemplate,
       base: "http:" + "//" + paramHost + ":" + paramPort,
-      variables: settings?.variables ? settings.variables : JSON5.stringify({ title: "Hello World" }, null, 2),
+      variables: settings?.variables ? settings.variables : DEFAULT_VARIABLES,
     };
     formReset(input);
     setURL(FORM_TO_URL(input));
@@ -460,6 +462,7 @@ function VALIDATE_URL(value: string) {
 }
 
 function VALIDATE_JSON5(value: string) {
+  if (!value) return true;
   try {
     JSON5.parse(value);
     return true;
