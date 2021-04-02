@@ -1,6 +1,9 @@
 const NODE_ENV = process.env.NODE_ENV || "development";
 
 const config = {
+  future: {
+    webpack5: true,
+  },
   poweredByHeader: false,
   // Build time
   env: {},

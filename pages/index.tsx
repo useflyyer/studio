@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Flayyer from "@flayyer/flayyer";
 import { Sizes } from "@flayyer/flayyer-types";
 import { ErrorMessage } from "@hookform/error-message";
-import classNames from "classnames";
+import clsx from "clsx";
 import JSON5 from "json5";
 import NextHead from "next/head";
 import qs from "qs";
@@ -173,7 +173,10 @@ export default function Home() {
     mode: "onBlur",
     defaultValues: { agent: "" },
   });
-  const { reset: formReset } = form;
+  const {
+    reset: formReset,
+    formState: { errors },
+  } = form;
 
   const [settings, setSettings] = useLocalStorage<{ ratio?: number; variables?: string; modes?: FrameMode[] }>(
     "settings",
@@ -293,26 +296,25 @@ export default function Home() {
                 <div className="control">
                   <input
                     className="input"
-                    name="base"
                     type="url"
-                    ref={form.register({
+                    {...form.register("base", {
                       validate: { url: VALIDATE_URL },
                     })}
                     placeholder="http://localhost:7777"
                   />
                 </div>
                 <p className="help is-danger">
-                  <ErrorMessage name="base" errors={form.errors} />
+                  <ErrorMessage name="base" errors={errors} />
                 </p>
               </div>
 
               <div className="field">
                 <label className="label">Template</label>
                 <div className="control">
-                  <input className="input" name="template" type="text" ref={form.register()} placeholder="main" />
+                  <input className="input" type="text" {...form.register("template")} placeholder="main" />
                 </div>
                 <p className="help is-danger">
-                  <ErrorMessage name="template" errors={form.errors} />
+                  <ErrorMessage name="template" errors={errors} />
                 </p>
                 <p className="help">{"Same as your template's file name without extension"}</p>
               </div>
@@ -321,7 +323,7 @@ export default function Home() {
                 <label className="label">User agent</label>
                 <div className="control">
                   <div className="select is-fullwidth">
-                    <select name="agent" ref={form.register}>
+                    <select {...form.register("agent")}>
                       <option value="">Default</option>
                       <option value="whatsapp">WhatsApp</option>
                     </select>
@@ -338,8 +340,7 @@ export default function Home() {
                   <textarea
                     style={{ minHeight: "100px" }}
                     className="input"
-                    name="variables"
-                    ref={form.register({
+                    {...form.register("variables", {
                       validate: { json: VALIDATE_JSON5 },
                     })}
                     rows={4}
@@ -347,7 +348,7 @@ export default function Home() {
                   />
                 </div>
                 <p className="help is-danger">
-                  <ErrorMessage name="variables" errors={form.errors} />
+                  <ErrorMessage name="variables" errors={errors} />
                 </p>
                 <p className="help">
                   Read this value form the <code>variables</code> prop
@@ -411,7 +412,7 @@ export default function Home() {
                     {MODES.map((mode) => (
                       <p key={mode.mode} className="control">
                         <button
-                          className={classNames({
+                          className={clsx({
                             "button is-primary is-light has-text-weight-semibold": true,
                             "is-active": modes.has(mode.mode),
                           })}
