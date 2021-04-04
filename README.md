@@ -14,6 +14,8 @@ yarn run flayyer start
 # Opens https://flayyer.github.io/flayyer-studio
 ```
 
+After testing in a couple of browsers **we recommend running this on Firefox**.
+
 ---
 
 ## Local server
