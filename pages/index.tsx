@@ -112,14 +112,16 @@ export default function Home() {
   const [settings, setSettings] = useLocalStorage<LocalStorageState>("settings");
 
   const paramTemplate = useSearchParam("template") || "main";
+  const paramProtocol = useSearchParam("protocol") || "http:";
   const paramHost = useSearchParam("host") || "localhost";
   const paramPort = useSearchParam("port") || "7777";
 
   // Kind of "on mount", ignore `settings` dependency
   useEffect(() => {
+    const protocol = paramProtocol.endsWith(":") ? paramProtocol : `${paramProtocol}:`;
     const input: FormSchema = {
       template: paramTemplate,
-      base: "http:" + "//" + paramHost + ":" + paramPort,
+      base: protocol + "//" + paramHost + ":" + paramPort,
       variables: settings?.variables ? settings.variables : DEFAULT_VARIABLES,
     };
     formReset(input);
@@ -127,7 +129,7 @@ export default function Home() {
     if (settings?.ratio) setRatio(settings.ratio);
     if (settings?.modes) settings.modes.forEach((m) => setModes.add(m));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formReset, paramTemplate, paramHost, paramPort]);
+  }, [formReset, paramTemplate, paramProtocol, paramHost, paramPort]);
 
   const handleValidSubmit = form.handleSubmit((input) => {
     try {
