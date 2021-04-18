@@ -14,7 +14,7 @@ yarn run flayyer start
 # Opens https://flayyer.github.io/flayyer-studio
 ```
 
-After testing in a couple of browsers **we recommend running this on Firefox**.
+After testing in a couple of browsers **we recommend running this on Firefox**. The only way of running this on Safari is by cloning this repository and running it locally.
 
 ---
 
