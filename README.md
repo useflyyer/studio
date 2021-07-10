@@ -1,17 +1,17 @@
-# [flayyer.github.io/flayyer-studio](https://flayyer.github.io/flayyer-studio)
+# [useflyyer.github.io/studio](https://useflyyer.github.io/studio)
 
-Companion of [@flayyer/cli](https://github.com/flayyer/flayyer-cli)
+Companion of [@flyyer/cli](https://github.com/useflyyer/flyyer-cli)
 
-[![screenshot of the UI](./.github/screenshot.png)](https://flayyer.github.io/flayyer-studio)
+[![screenshot of the UI](./.github/screenshot.png)](https://useflyyer.github.io/studio)
 
 > Photo by Calbert Warner from [Pexels](https://www.pexels.com/photo/woman-above-man-2889943/)
 
-There is no need to run this on your machine, just go to [the deployed site on GitHub](flayyer.github.io/flayyer-studio) to develop and preview your flayyer templates.
+There is no need to run this on your machine, just go to [the deployed site on GitHub](useflyyer.github.io/studio) to develop and preview your flyyer templates.
 
 ```sh
-yarn add --dev @flayyer/cli
-yarn run flayyer start
-# Opens https://flayyer.github.io/flayyer-studio
+yarn add --dev @flyyer/cli
+yarn run flyyer start
+# Opens https://useflyyer.github.io/studio
 ```
 
 After testing in a couple of browsers **we recommend running this on Firefox**. The only way of running this on Safari is by cloning this repository and running it locally.
@@ -25,8 +25,8 @@ In the case you want to run this locally:
 Clone the repository and install all the dependencies:
 
 ```sh
-git clone https://github.com/flayyer/flayyer-studio.git
-cd flayyer-studio
+git clone https://github.com/useflyyer/studio.git
+cd studio
 yarn install
 ```
 
@@ -47,9 +47,9 @@ yarn dev
 
 ## Deploy to GitHub Pages
 
-> Documentation for the developers at Flayyer
+> Documentation for the developers at Flyyer
 
-Make sure you are part of the `flayyer` organization, then run:
+Make sure you are part of the `flyyer` organization, then run:
 
 ```sh
 NODE_ENV=production yarn run build && yarn run export && yarn run deploy

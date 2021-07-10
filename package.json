@@ -1,6 +1,6 @@
 {
-  "name": "flayyer-studio",
-  "version": "0.8.2",
+  "name": "flyyer-studio",
+  "version": "0.9.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,14 +12,14 @@
   },
   "author": {
     "name": "Patricio Lopez Juri",
-    "email": "patricio@flayyer.com"
+    "email": "patricio@flyyer.io"
   },
-  "homepage": "https://github.com/flayyer/flayyer-studio",
+  "homepage": "https://github.com/useflyyer/studio",
   "repository": {
-    "url": "https://github.com/flayyer/flayyer-studio"
+    "url": "https://github.com/useflyyer/studio"
   },
   "dependencies": {
-    "@flayyer/flayyer": "^2.3.1",
+    "@flyyer/flyyer": "^3.0.1",
     "@hookform/error-message": "^0.0.5",
     "clsx": "^1.1.1",
     "dedent": "^0.7.0",
@@ -34,8 +34,8 @@
     "styled-components": "^5.2.3"
   },
   "devDependencies": {
-    "@flayyer/eslint-config": "^1.0.6",
-    "@flayyer/flayyer-types": "^1.8.0",
+    "@flyyer/eslint-config": "^2.0.1",
+    "@flyyer/types": "^2.0.2",
     "@types/dedent": "^0.7.0",
     "@types/json5": "^2.2.0",
     "@types/lodash": "^4.14.168",

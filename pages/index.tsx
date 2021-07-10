@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-import Flayyer from "@flayyer/flayyer";
-import { Sizes } from "@flayyer/flayyer-types";
+import { FlyyerRender } from "@flyyer/flyyer";
+import { Sizes } from "@flyyer/types";
 import { ErrorMessage } from "@hookform/error-message";
 import clsx from "clsx";
 import dedent from "dedent";
@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { useLocalStorage, useSearchParam, useSet } from "react-use";
 import styled from "styled-components";
 
-import { FlayyerLogo } from "~/components/FlayyerLogo";
+import { FlyyerLogo } from "~/components/FlyyerLogo";
 import { IFrameProps, IFrameContainer, IFrameWrap, IFrame } from "~/components/IFrame";
 import {
   WorkspaceBackground,
@@ -22,15 +22,15 @@ import {
   WorkspaceMenuItem,
 } from "~/components/Workspace";
 
-const flayyer = new Flayyer({
-  tenant: "flayyer",
+const flyyer = new FlyyerRender({
+  tenant: "flyyer",
   deck: "landing",
   template: "demo",
   extension: "png",
   meta: {
-    id: "flayyer-studio",
+    id: "flyyer-studio",
   },
-  variables: { title: "Flayyer Studio", description: "Development companion tool" },
+  variables: { title: "Flyyer Studio", description: "Development companion tool" },
 });
 
 const Container = styled.div`
@@ -189,28 +189,28 @@ export default function Home() {
 
   const agent = form.watch("agent");
 
-  const META_URL = "https://flayyer.github.io/flayyer-studio";
-  const META_TWITTER = "@flayyer_com";
-  const META_TITLE = "Flayyer Studio for developers";
+  const META_URL = "https://useflyyer.github.io/studio";
+  const META_TWITTER = "@useflyyer";
+  const META_TITLE = "Flyyer Studio for developers";
   const META_DESCRIPTION = dedent`
-    The official developer workspace to create and preview your Flayyers locally.
+    The official developer workspace to create and preview your flyyers locally.
     It connects to your localhost so you don't need to install additional software.
   `;
   return (
     <div>
       <NextHead>
         <meta charSet="UTF-8" />
-        <title>Flayyer Studio</title>
-        <link rel="icon" href="/flayyer-studio/favicon.ico?__v=1" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/flayyer-studio/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/flayyer-studio/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/flayyer-studio/favicon-16x16.png" />
-        <link rel="manifest" href="/flayyer-studio/site.webmanifest" />
+        <title>Flyyer Studio</title>
+        <link rel="icon" href="/studio/favicon.ico?__v=1" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/studio/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/studio/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/studio/favicon-16x16.png" />
+        <link rel="manifest" href="/studio/site.webmanifest" />
         <meta property="og:title" content={META_TITLE} />
         <meta property="og:description" content={META_DESCRIPTION} />
         <meta property="og:url" content={META_URL} />
-        <meta property="og:image" content={flayyer.href()} />
-        <meta property="og:site_name" content="Flayyer Studio" />
+        <meta property="og:image" content={flyyer.href()} />
+        <meta property="og:site_name" content="Flyyer Studio" />
         <meta property="og:locale" content="en_US" />
         <meta name="twitter:title" content={META_TITLE} />
         <meta name="twitter:description" content={META_DESCRIPTION} />
@@ -218,13 +218,13 @@ export default function Home() {
         <meta name="twitter:site" content={META_TWITTER} />
         <meta name="twitter:creator" content={META_TWITTER} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content={flayyer.href()} />
+        <meta name="twitter:image" content={flyyer.href()} />
       </NextHead>
       <main>
         <Container>
           <Aside>
             <div>
-              <FlayyerLogo />
+              <FlyyerLogo />
             </div>
 
             <form onSubmit={handleValidSubmit}>
@@ -232,8 +232,8 @@ export default function Home() {
                 <p>
                   Get the Base URL by running <code>npm start</code> or <code>yarn start</code> on your project created
                   with{" "}
-                  <a href="https://github.com/flayyer/create-flayyer-app" target="_blank" rel="noopener noreferrer">
-                    create-flayyer-app
+                  <a href="https://github.com/useflyyer/create-flyyer-app" target="_blank" rel="noopener noreferrer">
+                    create-flyyer-app
                   </a>
                 </p>
               </div>

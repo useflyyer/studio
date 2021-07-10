@@ -17,8 +17,8 @@ const config = {
 };
 
 if (NODE_ENV === "production") {
-  config.basePath = "/flayyer-studio";
-  config.assetPrefix = "/flayyer-studio/";
+  config.basePath = "/studio";
+  config.assetPrefix = "/studio/";
 }
 
 module.exports = config;
