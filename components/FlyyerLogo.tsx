@@ -2,11 +2,11 @@ import React from "react";
 
 import styled from "styled-components";
 
-export function FlayyerLogo(props: React.ComponentProps<typeof Logo>) {
+export function FlyyerLogo(props: React.ComponentProps<typeof Logo>) {
   return (
     <Logo {...props}>
-      <a href="https://flayyer.com?ref=studio" rel="noreferrer noopener" target="_blank">
-        FLAYYER STUDIO
+      <a href="https://flyyer.io?ref=studio" rel="noreferrer noopener" target="_blank">
+        FLYYER STUDIO
       </a>
     </Logo>
   );

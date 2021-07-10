@@ -1,14 +1,14 @@
 {
-  "name":"Flayyer Studio",
-  "short_name":"Flayyer Studio",
+  "name":"Flyyer Studio",
+  "short_name":"Flyyer Studio",
   "icons":[
     {
-      "src":"/flayyer-studio/android-chrome-192x192.png",
+      "src":"/studio/android-chrome-192x192.png",
       "sizes":"192x192",
       "type":"image/png"
     },
     {
-      "src":"/flayyer-studio/android-chrome-512x512.png",
+      "src":"/studio/android-chrome-512x512.png",
       "sizes":"512x512",
       "type":"image/png"
     }
